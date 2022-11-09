@@ -16,6 +16,7 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/f64"
+	"golang.org/x/image/math/fixed"
 )
 
 type LineCap int
@@ -736,7 +737,7 @@ func (dc *Context) drawString(im *image.RGBA, s string, spacing int32, x, y floa
 			SrcMask:  mask,
 			SrcMaskP: maskp,
 		})
-		d.Dot.X += advance + (spacing * 64)
+		d.Dot.X += advance + (fixed.Int26_6(spacing) * 64)
 		prevC = c
 	}
 }
@@ -765,7 +766,7 @@ func (dc *Context) DrawStringAnchored(s string, spacing int32, x, y, ax, ay floa
 // DrawStringWrapped word-wraps the specified string to the given max width
 // and then draws it at the specified anchor point using the given line
 // spacing and text alignment.
-func (dc *Context) DrawStringWrapped(s string, x, y, ax, ay, width, lineSpacing float64, align Align) {
+func (dc *Context) DrawStringWrapped(s string, spacing int32, x, y, ax, ay, width, lineSpacing float64, align Align) {
 	lines := dc.WordWrap(s, width)
 
 	// sync h formula with MeasureMultilineString
@@ -786,7 +787,7 @@ func (dc *Context) DrawStringWrapped(s string, x, y, ax, ay, width, lineSpacing 
 	}
 	ay = 1
 	for _, line := range lines {
-		dc.DrawStringAnchored(line, x, y, ax, ay)
+		dc.DrawStringAnchored(line, spacing, x, y, ax, ay)
 		y += dc.fontHeight * lineSpacing
 	}
 }
